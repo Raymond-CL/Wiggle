@@ -23,7 +23,9 @@ class kinematics {
   int qtn;
 
   // photo and lepton momentum
-  vec2d lep1, lep2, pho1, pho2;
+  vec2d lep1, lep2;
+  vec2d phoa, phob, pho1, pho2;
+  vec2d pt, qt;
   double rap1, rap2, rapmin, rapmax;
 
   // transverse mass

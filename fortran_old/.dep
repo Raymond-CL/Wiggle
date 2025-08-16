@@ -1,0 +1,16 @@
+FOBJ=obj/nr.o obj/nrtype.o obj/nrutil.o obj/ran1.o obj/ran_state.o obj/vegas.o obj/comvar.o obj/kinematics.o obj/photonff.o obj/vector2d.o obj/main.o 
+
+dilepton.exe: $(FOBJ)
+	@$(FC) $(FFLAGS) -I $(moddir) $(FOBJ) -o $@
+
+obj/nr.o : nr/nr.f90 obj/nrtype.o 
+obj/nrtype.o : nr/nrtype.f90 
+obj/nrutil.o : nr/nrutil.f90 obj/nrtype.o 
+obj/ran1.o : nr/ran1.f90 obj/ran_state.o obj/nrtype.o 
+obj/ran_state.o : nr/ran_state.f90 obj/nrutil.o obj/nrtype.o 
+obj/vegas.o : nr/vegas.f90 obj/nr.o obj/nrtype.o 
+obj/comvar.o : src/comvar.f90 obj/nrtype.o 
+obj/kinematics.o : src/kinematics.f90 obj/vector2d.o obj/photonff.o obj/comvar.o obj/nrtype.o 
+obj/photonff.o : src/photonff.f90 obj/comvar.o obj/nrtype.o 
+obj/vector2d.o : src/vector2d.f90 obj/nrtype.o 
+obj/main.o : main.f90 obj/kinematics.o obj/comvar.o obj/nr.o obj/nrtype.o 

@@ -1,0 +1,14 @@
+5020d0                        ! Center of mass energy per nucleon (GeV)
+0d0, 0.012d0, 30              ! lepton alpha range
+4d0, 25d0                     ! lepton pt range (GeV)
+-2.4d0, +2.4d0                ! lepton rapidity range
+0d0, 5d0                      ! photon kt range (GeV)
+4d0, 45d0                     ! invariant mass range (GeV)
+0.06d0                        ! dilepton asymmetry cut
+207, 82                       ! atomic mass and num (A,Z)
+00d0                          ! b-upc (fm)
+0d0,3.5d0                     ! impact parameter b-perp range (fm)
+2                             ! lepton mass (1=ele, 2=mu, 3=tau)
+200000, 10                 ! vegas warm up
+2000000, 1                 ! vegas end run
+.false.                       ! debug flag

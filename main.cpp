@@ -1,86 +1,87 @@
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_monte.h>
+#include <gsl/gsl_monte_vegas.h>
+#include <stdlib.h>
+
+#include <cmath>
+#include <iomanip>
 #include <iostream>
+#include <vector>
 
-#include "kinematics.h"
-#include "photonff.h"
-#include "vegas.h"
-
-// parameters passed to the integrand function
 struct parameters {
-  kinematics *kin;
-  photonff *pho;
+  size_t dim;
+  double rad;
 };
 
-// integrand function for VEGAS integration
-double integrand(double *dx, size_t dim, void *params_void) {
-  auto *params = static_cast<parameters *>(params_void);
-  return 1.0;  // params->kin->qt_imb;
-  // double rsq = 0.0;
-  // for (size_t i = 0; i < dim; ++i) rsq += dx[i] * dx[i];
-  // return (rsq <= params->R * params->R) ? 1.0 : 0.0;
+double integrand(double *dx, size_t ndim, void *params) {
+  (void)(ndim);  // unused
+  // static cast params to p-pointer
+  auto *p = static_cast<parameters *>(params);
+  double rsq = 0.0;
+  for (size_t i = 0; i < ndim; ++i) rsq += dx[i] * dx[i];
+  return (rsq <= p->rad * p->rad) ? 1.0 : 0.0;
 }
 
-int main() {
-  kinematics *kin = new kinematics();
-  photonff *pho = new photonff();
+int main(int argc, char *argv[]) {
+  // command-line arguments
+  (void)(argc);
+  (void)(argv);
 
-  kin->CME = 5020.0;
-  kin->qtmin = 0.0;
-  kin->qtmax = 0.1;
-  kin->qtn = 50;
-  kin->ylmin = -1.0;
-  kin->ylmax = +1.0;
-  kin->pltmin = 4.0;
-  kin->pltmax = 20.0;
-  kin->Mllmin = 4.0;
-  kin->Mllmax = 45.0;
-  kin->ktmin = 0.0;
-  kin->ktmax = 10.0;
-  kin->m_lep = phys::M_MU;
+  // define number of dimensions and radius
+  size_t ndim = 10;
+  double radius = 1.0;
+  parameters p = {ndim, radius};
 
-  pho->atom_A = 207;
-  pho->atom_Z = 82;
-  pho->radius = 6.62 / phys::GEVfm;
+  // define integration limits
+  std::vector<double> dx_lower(ndim, -radius);
+  std::vector<double> dx_upper(ndim, +radius);
 
-  const size_t DIM = 9;
+  // setup integrand
+  gsl_monte_function gmf = {&integrand, ndim, &p};
 
-  double xlow[DIM], xup[DIM];
-  xlow[0] = kin->ktmin, xup[0] = kin->ktmax;
-  xlow[1] = 0.0, xup[1] = phys::twoPI;
-  xlow[2] = kin->ktmin, xup[2] = kin->ktmax;
-  xlow[3] = 0.0, xup[3] = phys::twoPI;
-  xlow[4] = kin->ylmin, xup[4] = kin->ylmax;
-  xlow[5] = kin->ylmin, xup[5] = kin->ylmax;
-  xlow[6] = kin->pltmin, xup[6] = kin->pltmax;
-  xlow[7] = 0.0, xup[7] = phys::twoPI;
-  xlow[8] = 0.0, xup[8] = phys::twoPI;
+  // setup Monte-Carlo integration environment
+  gsl_rng_env_setup();
+  gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
+  gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(ndim);
+  gsl_monte_vegas_params vp;
 
-  vegas *v = new vegas(DIM);
-  v->set_limits(xlow, xup);
-  parameters params = {kin, pho};
-  v->set_integrand(&integrand, &params);
+  // define base call and iteration number
+  size_t n = 10000000;
+  size_t total = 10;
+  size_t w = 8, f = total - w;
 
-  int nbin = kin->qtn;
-  double hmin = kin->qtmin;
-  double hmax = kin->qtmax;
-  bool islog = false;
-  double bin = islog ? log(hmax / hmin) / nbin : (hmax - hmin) / nbin;
-  double binL, binM, binR;
-  double res, err;
-  for (int ind = 1; ind <= nbin; ++ind) {
-    binL = islog ? hmin * std::exp(bin * (ind - 1)) : hmin + bin * (ind - 1);
-    binR = islog ? hmin * std::exp(bin * ind) : hmin + bin * ind;
-    binM = 0.5 * (binL + binR);
-    kin->qt_imb = binM;
+  // define output format and analytic result
+  std::cout << std::setprecision(15) << std::fixed;
+  constexpr double pi = 3.14159265358979323846;
+  double exact = std::pow(pi * radius * radius, ndim / 2.0) /
+                 std::tgamma(ndim / 2.0 + 1.0);
+  double result, error;
 
-    v->integrate(1E6, 10, res, err);
-    std::cout << kin->qt_imb << '\t' << res << '\t' << err / res << std::endl;
-  }
+  // warmup run: iteration=w, calls=n
+  gsl_monte_vegas_params_get(s, &vp);
+  vp.stage = 0;
+  vp.iterations = w;
+  gsl_monte_vegas_params_set(s, &vp);
+  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim,
+                            n, r, s, &result, &error);
 
-  // clean up
-  delete kin;
-  delete pho;
-  delete v;
+  // final run: iteration=1, calls=f*n
+  gsl_monte_vegas_params_get(s, &vp);
+  vp.stage = 2;
+  vp.iterations = 1;
+  gsl_monte_vegas_params_set(s, &vp);
+  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim,
+                            f * n, r, s, &result, &error);
 
-  // end program
+  // total calls: w*n + f*n = total*n
+  std::cout << "vegas result = " << result << ", error = " << error
+            << std::endl;
+  std::cout << "exact result = " << exact
+            << ", error = " << std::abs(result - exact) << std::endl;
+
+  // free resources
+  gsl_monte_vegas_free(s);
+  gsl_rng_free(r);
+
   return 0;
 }
