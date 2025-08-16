@@ -9,7 +9,6 @@
 #include <vector>
 
 struct parameters {
-  size_t dim;
   double rad;
 };
 
@@ -30,7 +29,7 @@ int main(int argc, char *argv[]) {
   // define number of dimensions and radius
   size_t ndim = 10;
   double radius = 1.0;
-  parameters p = {ndim, radius};
+  parameters p = {radius};
 
   // define integration limits
   std::vector<double> dx_lower(ndim, -radius);
@@ -48,7 +47,7 @@ int main(int argc, char *argv[]) {
   // define base call and iteration number
   size_t n = 10000000;
   size_t total = 10;
-  size_t w = 8, f = total - w;
+  size_t w = 5, f = total - w;
 
   // define output format and analytic result
   std::cout << std::setprecision(15) << std::fixed;
