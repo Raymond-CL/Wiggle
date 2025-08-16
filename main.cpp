@@ -22,13 +22,16 @@ double integrand(double *dx, size_t ndim, void *params) {
 }
 
 int main(int argc, char *argv[]) {
-  // command-line arguments
-  (void)(argc);
-  (void)(argv);
-
   // define number of dimensions and radius
-  size_t ndim = 10;
-  double radius = 1.0;
+  size_t ndim;
+  double radius;
+  if (argc == 3) {
+    ndim = std::stoul(argv[1]);
+    radius = std::stod(argv[2]);
+  } else {
+    ndim = 8;
+    radius = 1.0;
+  }
   parameters p = {radius};
 
   // define integration limits
@@ -45,12 +48,12 @@ int main(int argc, char *argv[]) {
   gsl_monte_vegas_params vp;
 
   // define base call and iteration number
-  size_t n = 10000000;
+  size_t n = 1000000;
   size_t total = 10;
   size_t w = 5, f = total - w;
 
   // define output format and analytic result
-  std::cout << std::setprecision(15) << std::fixed;
+  std::cout << std::setprecision(10) << std::fixed;
   constexpr double pi = 3.14159265358979323846;
   double exact = std::pow(pi * radius * radius, ndim / 2.0) /
                  std::tgamma(ndim / 2.0 + 1.0);
@@ -61,16 +64,16 @@ int main(int argc, char *argv[]) {
   vp.stage = 0;
   vp.iterations = w;
   gsl_monte_vegas_params_set(s, &vp);
-  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim,
-                            n, r, s, &result, &error);
+  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim, n, r,
+                            s, &result, &error);
 
   // final run: iteration=1, calls=f*n
   gsl_monte_vegas_params_get(s, &vp);
   vp.stage = 2;
   vp.iterations = 1;
   gsl_monte_vegas_params_set(s, &vp);
-  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim,
-                            f * n, r, s, &result, &error);
+  gsl_monte_vegas_integrate(&gmf, dx_lower.data(), dx_upper.data(), ndim, f * n,
+                            r, s, &result, &error);
 
   // total calls: w*n + f*n = total*n
   std::cout << "vegas result = " << result << ", error = " << error
