@@ -1,1 +1,2 @@
-g++ -std=c++11 -O2 -Wall -Wextra -pedantic main.cpp -o main -lgsl
+g++ -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion \
+  -O3 physconst.h main.cpp -o wiggle.exe -lgsl

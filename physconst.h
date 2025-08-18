@@ -17,7 +17,7 @@ constexpr double HBARC = HBAR * LIGHT_SPEED;
 // unit conversion constants
 constexpr double GIGA = 1.0e9;
 constexpr double femto = 1.0e-15;
-constexpr double GEVfm = HBARC / GIGA / femto;
+constexpr double GeVfm = HBARC / GIGA / femto;
 
 // particle masses
 constexpr double M_pro = 0.93827208816;
@@ -25,6 +25,9 @@ constexpr double M_neu = 0.93956542052;
 constexpr double M_ele = 0.00051;
 constexpr double M_mu  = 0.10566;
 constexpr double M_tau = 1.77686;
+
+constexpr double alphae = 1.0 / 137.036;
+constexpr double a0 = 1.0 / 1.4142135624 / GeVfm;
 }
 
 #endif  // PHYSCONST_H

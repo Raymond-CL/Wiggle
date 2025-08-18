@@ -78,7 +78,7 @@ contains
   type(vec2d) :: k1v,k2v,kav,kbv
   type(vec2d) :: k1av
   real(wp) :: pitermij,pitermkl
-  real(wp) :: ptmax
+  ! real(wp) :: ptmax
 
   !deltaphi = (1d0-alpha)*PI
   !phip1 = 0d0
@@ -99,7 +99,7 @@ contains
 
   !x1 = (m1t*exp(+y1) + m2t*exp(+y2))/CME
   !x2 = (m1t*exp(-y1) + m2t*exp(-y2))/CME
-  ptmax = pl_avg !max(p1v%m(),p2v%m())
+  ptmax = max(p1v%m(),p2v%m())
   x1 = ptmax * (exp(+y1) + exp(+y2))/CME
   x2 = ptmax * (exp(-y1) + exp(-y2))/CME
 

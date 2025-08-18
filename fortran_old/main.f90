@@ -49,8 +49,8 @@ program main
   m_lep = M_mu
   !RA = 6.62d0 / gevfm
   RA = 6.62d0 / gevfm
-  ncall1 = 100000;   itmax1 = 10
-  ncall2 = 1000000;  itmax2 = 1
+  ncall1 = 10000000;   itmax1 = 10
+  ncall2 = 100000000;  itmax2 = 1
 
   ! initialize vegas variables
   nprn = -1
@@ -92,7 +92,7 @@ program main
 
     !eff = real(accevnt,wp)/real(totevnt,wp)*100d0
     u = stdout
-    write(u,*) qt_imb,avgi,sd/avgi!,real(eff),'%'
+    write(u,*) qt_imb,avgi,sd!,real(eff),'%'
     u = getu()
     open(u,file=ofile,position='append')
     write(u,*) qt_imb,avgi,sd/avgi!,real(eff),'%'
@@ -132,6 +132,17 @@ function func(dx,wgt)
   phi_pl  = dx(8)
   phi_qt  = dx(9)
 
+  ! k1t = 2d0
+  ! phik1 = 1d0
+  ! kat = 2d0
+  ! phika = 1d0
+  ! y1 = 0d0
+  ! y2 = 0d0
+  ! pl_avg = 10d0
+  ! phi_pl = 1d0
+  ! phi_qt = 2d0
+  ! qt_imb = 0.05d0
+
   bp = 10d0 / gevfm
 
   call setkinematics 
@@ -140,6 +151,8 @@ function func(dx,wgt)
   if(x2.le.0d0 .or. x2.ge.1d0) return
   if(Mll.le.Mllmin .or. Mll.ge.Mllmax) return
   !if(aj.ge.ajcut) return
+
+  
 
   bessel = bp / twoPI * bessel_jn(0,bp*k1ka)
   !bessel = bp / twoPI * bessel_jn(2,bp*k1ka)
