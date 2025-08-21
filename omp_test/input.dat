@@ -1,0 +1,12 @@
+5020.0                    # CME
+2                         # 1:ds/dPt, 2:ds/dpt, 3:ds/dbp, 4:ds/da
+4.0   20.0    0           # Ptmin, Ptmax, Ptn
+0.0   0.1     50          # ptmin, ptmax, ptn
+0.5   1.5    0           # bpmin, bpmax, bpn
+0.0   0.0     0           # almin, almax, aln
+0.0   10.0               # ktmin, ktmax
+-1.0  +1.0               # ylmin, ylmax
+4.0   45.0               # Mllmin, Mllmax
+2                         # 1:electron, 2:muon, 3:tau
+500000  10                # warm-up ncalls, iteration
+5000000  1                # final ncalls, iteration

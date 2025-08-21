@@ -49,8 +49,8 @@ program main
   m_lep = M_mu
   !RA = 6.62d0 / gevfm
   RA = 6.62d0 / gevfm
-  ncall1 = 10000000;   itmax1 = 10
-  ncall2 = 100000000;  itmax2 = 1
+  ncall1 = 100000;   itmax1 = 10
+  ncall2 = 1000000;  itmax2 = 1
 
   ! initialize vegas variables
   nprn = -1
@@ -160,15 +160,16 @@ function func(dx,wgt)
   !bessel = bp / twoPI * bessel_jn(6,bp*k1ka)
   !bessel = bp / twoPI * bessel_jn(8,bp*k1ka)
 
-  !costerm = 1d0
+  costerm = 1d0
   !costerm = 2d0*cos(0d0*phi_pl + 0d0*phi_qt + 0d0*phi_dt)    ! 000
-  costerm = -2d0*cos(4d0*phi_pl - 4d0*phi_qt)
+  !costerm = -2d0*cos(4d0*phi_pl - 4d0*phi_qt)
 
   func = pl_avg * qt_imb * k1t * kat * bessel
   func = func * x1f1 * x2f2 * sigma0
   !func = func * gevfm**2 * fm2barn / micro    ! GeV^-2 -> mb
   func = func * costerm
 
+  ! write(*,*) x1f1, x2f2
 
   !if(isnan(func) .or. debug) then
     !write(*,*) 'something wrong'
