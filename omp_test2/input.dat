@@ -3,13 +3,13 @@
 -1.0  +1.0                # ylmin, ylmax
 2                         # 0:total, 1:ds/dPt, 2:ds/dpt, 3:ds/dbp, 4:ds/da
 4.0   20.0    0           # Ptmin, Ptmax, Ptn
-0.0   0.1     50          # ptmin, ptmax, ptn
-0.5   1.5     0           # bpmin, bpmax, bpn
+0.0   0.1     20          # ptmin, ptmax, ptn
+9.5   10.5    0           # bpmin, bpmax, bpn
 0.0   0.0     0           # almin, almax, aln
 false                     # do Sudakov
 0.0   5.0                 # ltmin, ltmax
 true                      # do Mll cut
-4.0   45.0                # Mllmin, Mllmax
+8.0   45.0                # Mllmin, Mllmax
 false                     # do Aj cut
 0.0   0.0                 # Ajmin, Ajmax
 false                     # do decoherent

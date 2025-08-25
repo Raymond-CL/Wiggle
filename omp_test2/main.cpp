@@ -75,41 +75,25 @@ double integrand(double *dx, size_t ndim, void *params) {
       return 0.0;
   }
 
-  // vec2d p1t, p2t;
-  // p1t = 0.5 * pt + PT;
-  // p2t = 0.5 * pt - PT;
-
-  // double t_pt, t_PT, t_p1t, t_p2t, t_qt2;
-  // double t_phipp = 1.0, t_phi12 = 3.0;
-  // t_pt = pt.mag();
-  // t_PT = PT.mag();
-  // t_p1t = t_pt * t_pt * 0.25 + t_PT * t_PT - t_pt * t_PT * std::cos(t_phipp);
-  // t_p2t = t_pt * t_pt * 0.25 + t_PT * t_PT + t_pt * t_PT * std::cos(t_phipp);
-  // t_qt2 =
-  //     t_p1t * t_p1t + t_p2t * t_p2t + 2.0 * t_p1t * t_p2t * std::cos(t_phi12);
-
-  // std::cout << "begin test:\n";
-  // std::cout << "pt: " << t_pt << std::endl
-  //           << "PT: " << t_PT << std::endl
-  //           << "p1t: " << t_p1t << std::endl
-  //           << "p2t: " << t_p2t << std::endl
-  //           << "qt2: " << t_qt2 << std::endl;
+  vec2d p1t, p2t;
+  p1t = 0.5 * pt + PT;
+  p2t = 0.5 * pt - PT;
 
   vec2d lt;
   if (p->do_sudakov) {
-    lt.setPolar(dx[10], dx[11]);
+    lt.setPolar(dx[10], dx[11]);  // not correct for total cross-section
   } else {
     lt.setPolar(0.0, 0.0);
   }
 
-  // double pthard = std::max(p1t.mag(), p2t.mag());
-  double pthard = PT.mag();
+  double pthard = std::max(p1t.mag(), p2t.mag());
+  // double pthard = PT.mag();
   double x1 = pthard * (std::exp(+y1) + std::exp(+y2)) / p->CME;
   double x2 = pthard * (std::exp(-y1) + std::exp(-y2)) / p->CME;
   if (x1 <= 0.0 || x1 >= 1.0) return 0.0;
   if (x2 <= 0.0 || x2 >= 1.0) return 0.0;
 
-  double mans = x1 * x2 * p->CME * p->CME;
+  double mans = +x1 * x2 * p->CME * p->CME;
   double mant = -x1 * p->CME * pthard * std::exp(-y1);
   double manu = -x1 * p->CME * pthard * std::exp(-y2);
   double Mll = std::sqrt(mans);
