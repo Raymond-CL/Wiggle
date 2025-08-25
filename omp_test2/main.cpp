@@ -108,8 +108,6 @@ double integrand(double *dx, size_t ndim, void *params) {
   double kasq = x1 * x1 * phys::Mp2 + kat.mag2();
   double k2sq = x2 * x2 * phys::Mp2 + k2t.mag2();
   double kbsq = x2 * x2 * phys::Mp2 + kbt.mag2();
-  double k1ka = (k1t - kat).mag();
-  // double k2kb = (k2t - kbt).mag();
 
   double iso = std::cos(k1t.phi() - kat.phi() + k2t.phi() - kbt.phi()) *
                (mant * mant + manu * manu) / (mant * manu);
@@ -143,9 +141,20 @@ double integrand(double *dx, size_t ndim, void *params) {
   double x1f1 = xf(std::sqrt(k1sq), std::sqrt(kasq), p);
   double x2f2 = xf(std::sqrt(k2sq), std::sqrt(kbsq), p);
 
-  double bessel = p->bp / phys::twoPI * gsl_sf_bessel_J0(p->bp * k1ka);
+  vec2d Dt;
+  Dt = k1t - kat;
+  // double k1ka = Dt.mag();
+  // double phi_Dt = Dt.phi();
+  // double k2kb = (k2t - kbt).mag();
 
-  // double costerm = -2.0 * std::cos(4.0 * k->phi_PT - 4.0 * k->phi_pt);
+  double bessel = p->bp / phys::twoPI * gsl_sf_bessel_J0(p->bp * Dt.mag());
+  // double bessel = p->bp / phys::twoPI * gsl_sf_bessel_Jn(4, p->bp *
+  // Dt.mag());
+
+  // double costerm = -2.0 * std::cos(4.0 * PT.phi() - 4.0 * pt.phi());
+  // double costerm = -2.0 * std::cos(4.0 * PT.phi() - 2.0 * pt.phi() - 2.0 *
+  // Dt.phi()); double costerm = -2.0 * std::cos(4.0 * pt.phi() - 4.0 *
+  // Dt.phi());
   double costerm = 1.0;
 
   double res = PT.mag() * pt.mag() * k1t.mag() * kat.mag() * bessel * x1f1 *
@@ -323,6 +332,16 @@ int main(int argc, char *argv[]) {
 
   // perform integration loop
   for (size_t i = 0; i < nbin; ++i) {
+#ifdef _OPENMP
+#pragma omp critical
+    {
+      std::cout << "Working on index: " << i
+                << "\t under thread: " << omp_get_thread_num() << std::endl;
+    }
+#else
+    std::cout << "Working on index: " << i << std::endl;
+#endif
+
     // define bin parameters
     double binL = hmin + static_cast<double>(i) * bin;
     double binR = hmin + static_cast<double>(i + 1) * bin;
@@ -375,10 +394,6 @@ int main(int argc, char *argv[]) {
     // free resources
     gsl_monte_vegas_free(s);
     gsl_rng_free(r);
-
-    // #ifdef _OPENMP
-    // std::cout << "Thread " << omp_get_thread_num() << ", index " << i << "
-    // finished" << std::endl; #endif
 
     // store result and error in array
     results[i] = res;
