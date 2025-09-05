@@ -233,6 +233,91 @@ int main(int argc, char *argv[]) {
   fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   fin.close();
 
+  // print program details
+  std::cout << "----------------------------------------" << std::endl;
+  std::cout << "Wiggle: Dilepton production in UPC" << std::endl;
+#if defined(__GNUC__) || defined(__GNUG__)
+  std::cout << "Using GCC version " << __VERSION__ << std::endl;
+#elif defined(__clang__)
+  std::cout << "Using Clang version " << __clang_version__ << std::endl;
+#elif defined(_MSC_VER)
+  std::cout << "Using MSVC version " << _MSC_VER << std::endl;
+#elif defined(__INTEL_COMPILER)
+  std::cout << "Using Intel C++ version " << __INTEL_COMPILER << std::endl;
+#else
+  std::cout << "Using unknown compiler" << std::endl;
+#endif
+  std::cout << "Using C++ standard version: " << __cplusplus << std::endl;
+  std::cout << "----------------------------------------" << std::endl;
+  std::cout << "Center-of-mass energy: " << p.CME << " GeV" << std::endl;
+  std::cout << "k1t: [" << ktmin << ", " << ktmax << "] GeV" << std::endl;
+  std::cout << "y1, y2: [" << ylmin << ", " << ylmax << "]" << std::endl;
+  std::cout << "Differential type: " << p.diff << std::endl;
+  switch (p.diff) {
+    case 0:
+      std::cout << "Total cross-section" << std::endl;
+      break;
+    case 1:
+      std::cout << "dSigma/dPT_rel with PT_rel in [" << PTmin << ", " << PTmax
+                << "] GeV"
+                << " with " << PTn << " bins" << std::endl;
+      break;
+    case 2:
+      std::cout << "dSigma/dpt_imb with pt_imb in [" << ptmin << ", " << ptmax
+                << "] GeV"
+                << " with " << ptn << " bins" << std::endl;
+      break;
+    case 3:
+      std::cout << "dSigma/dbp with bp in [" << bpmin << ", " << bpmax << "] fm"
+                << " with " << bpn << " bins" << std::endl;
+      break;
+    case 4:
+      std::cout << "dSigma/dal with al in [" << almin << ", " << almax << "]"
+                << " with " << aln << " bins" << std::endl;
+      break;
+    default:
+      std::cerr << "Invalid diff value: " << p.diff << std::endl;
+      return 1;
+  }
+  if (p.do_sudakov)
+    std::cout << "Including Sudakov factor with lt in [" << ltmin << ", "
+              << ltmax << "] GeV" << std::endl;
+  if (p.do_Mllcut)
+    std::cout << "Including dilepton mass cut with Mll in [" << p.Mllmin << ", "
+              << p.Mllmax << "] GeV" << std::endl;
+  if (p.do_Ajcut)
+    std::cout << "Including Aj cut with Aj in [" << p.Ajmin << ", " << p.Ajmax
+              << "]" << std::endl;
+  if (p.do_decoherent)
+    std::cout << "Including decoherent contribution" << std::endl;
+  if (p.do_aniso)
+    std::cout << "Including anisotropic contribution" << std::endl;
+  switch (p.lep) {
+    case 1:
+      std::cout << "Lepton type: electron" << std::endl;
+      break;
+    case 2:
+      std::cout << "Lepton type: muon" << std::endl;
+      break;
+    case 3:
+      std::cout << "Lepton type: tau" << std::endl;
+      break;
+    default:
+      std::cout << "Lepton type: all" << std::endl;
+      break;
+  }
+  std::cout << "Warm-up: " << ncall1 << " calls for " << itm1 << " iterations"
+            << std::endl;
+  std::cout << "Final:   " << ncall2 << " calls for " << itm2 << " iterations"
+            << std::endl;
+#ifdef _OPENMP
+  std::cout << "Using OpenMP with " << omp_get_max_threads() << " threads"
+            << std::endl;
+#else
+  std::cout << "Not using OpenMP" << std::endl;
+#endif
+  std::cout << "----------------------------------------" << std::endl;
+
   size_t ndim = 10;
   std::vector<double> dx_lower(ndim);
   std::vector<double> dx_upper(ndim);
@@ -335,11 +420,11 @@ int main(int argc, char *argv[]) {
 #ifdef _OPENMP
 #pragma omp critical
     {
-      std::cout << "Working on index: " << i
+      std::cout << "Working on bin: " << i
                 << "\t under thread: " << omp_get_thread_num() << std::endl;
     }
 #else
-    std::cout << "Working on index: " << i << std::endl;
+    std::cout << "Working on bin: " << i << std::endl;
 #endif
 
     // define bin parameters
@@ -403,6 +488,9 @@ int main(int argc, char *argv[]) {
   // define print function
   auto print = [](std::ostream &out, const std::vector<double> &x,
                   const std::vector<double> &y, const std::vector<double> &e) {
+    out << "----------------------------------------" << std::endl
+        << std::scientific << std::setprecision(6)
+        << "#   x    \t    y    \t   error  " << std::endl;
     for (size_t i = 0; i < x.size(); ++i)
       out << x[i] << '\t' << y[i] << '\t' << e[i] << std::endl;
   };
@@ -416,7 +504,10 @@ int main(int argc, char *argv[]) {
   // display elapsed time
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
-  std::cout << "Elapsed time: " << elapsed.count() << " seconds" << std::endl;
+  std::cout << "----------------------------------------" << std::endl
+            << "Elapsed time: " << std::defaultfloat << elapsed.count()
+            << " seconds\n"
+            << "----------------------------------------" << std::endl;
 
   return 0;
 }

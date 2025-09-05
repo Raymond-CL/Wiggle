@@ -15,5 +15,5 @@ false                     # do Aj cut
 false                     # do decoherent
 true                      # do anisotropy
 2                         # 1:electron, 2:muon, 3:tau
-5000000  10                # warm-up ncalls, iteration
-50000000  1                # final ncalls, iteration
+500000  10                # warm-up ncalls, iteration
+5000000  1                # final ncalls, iteration
