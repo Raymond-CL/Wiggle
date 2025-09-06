@@ -488,15 +488,16 @@ int main(int argc, char *argv[]) {
   // define print function
   auto print = [](std::ostream &out, const std::vector<double> &x,
                   const std::vector<double> &y, const std::vector<double> &e) {
-    out << "----------------------------------------" << std::endl
-        << std::scientific << std::setprecision(6)
-        << "#   x    \t    y    \t   error  " << std::endl;
     for (size_t i = 0; i < x.size(); ++i)
       out << x[i] << '\t' << y[i] << '\t' << e[i] << std::endl;
   };
 
-  // output results at the end
+  // print to console
+  std::cout << "----------------------------------------" << std::endl
+            << std::scientific << std::setprecision(6)
+            << "#   x    \t    y    \t   error  " << std::endl;
   print(std::cout, bin_mid, results, errors);
+  // print to file
   std::ofstream fout("results.txt", std::ios::out);
   print(fout, bin_mid, results, errors);
   fout.close();
