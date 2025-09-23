@@ -182,6 +182,8 @@ double integrand(double *dx, size_t ndim, void *params) {
   return res;
 }
 
+
+
 // main program
 int main(int argc, char *argv[]) {
   // check command line arguments
