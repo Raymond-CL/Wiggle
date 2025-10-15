@@ -12,7 +12,7 @@ doc.add_paragraph('DMP version: [1.0]')
 
 doc.add_heading('1. Data Summary', level=2)
 
-doc.add_paragraph('something')
+doc.add_paragraph('')
 
 output_path = './dmp.docx'
 doc.save(output_path)
