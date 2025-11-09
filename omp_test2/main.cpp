@@ -412,7 +412,7 @@ int main(int argc, char *argv[]) {
 
 // define OpenMP parallel region
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
 #endif
 
   // perform integration loop

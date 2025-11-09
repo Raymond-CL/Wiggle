@@ -3,7 +3,7 @@
 -1.0  +1.0                # ylmin, ylmax
 2                         # 0:total, 1:ds/dPt, 2:ds/dpt, 3:ds/dbp, 4:ds/da
 4.0   20.0    0           # Ptmin, Ptmax, Ptn
-0.0   0.1     20          # ptmin, ptmax, ptn
+0.0   0.1     50          # ptmin, ptmax, ptn
 0.0   20.0    20          # bpmin, bpmax, bpn
 0.0   0.0     0           # almin, almax, aln
 false                     # do Sudakov
